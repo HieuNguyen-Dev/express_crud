@@ -63,7 +63,7 @@ module.exports = {
         if (!teacher) return res.status(400).send("Teacher Id not correct or this user is not teacher");
 
         try {
-            await Class.findOneAndUpdate({ name: name }, { subject: subjectName, teacher: teacher.name, startDate: startDate, endDate: endDate })
+            await Class.findOneAndUpdate({ name: name }, { subject: subjectName, teacher: teacherId, startDate: startDate, endDate: endDate })
             res.send("Class is updated");
         }
         catch (errors) {

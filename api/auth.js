@@ -63,7 +63,7 @@ module.exports = {
             } else {
                 const savedAuth = await Auth.findOneAndUpdate(({ user: auth.user }, { token: token }));
                 const newAuth = await Auth.findOne({ user: user._id });
-                res.header('auth-token', newAuth.token)
+                res.header('auth-token', newAuth.token);
                 res.send("Login Succes");
             }
         } catch (error) {

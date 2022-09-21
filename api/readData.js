@@ -2,6 +2,7 @@ const router = require('express').Router();
 const User = require('../model/User');
 const Subject = require('../model/Subject');
 const Class = require('../model/Class');
+const Auth = require('../model/Auth');
 const Class_Detail = require('../model/Class_Detail.js');
 const verify = require('./checkPermission');
 const moment = require('moment'); // require
@@ -44,6 +45,16 @@ module.exports = {
     }
   },
 
+  //Get Class List 
+  getClasses: async (req, res) => {
+    const classes = await Class.find();
+    try {
+      res.send(classes);
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  },
+
   // Find Student By Name Or Email
   findStudent: async (req, res) => {
     const info = req.param('studentInfo');
@@ -73,28 +84,58 @@ module.exports = {
   studentInClass: async (req, res) => {
     const className = req.param('className');
     const classData = await Class.findOne({ name: className });
+    if (!classData) return res.status(500).send("No found class");
 
     const classStdents = await Class_Detail.find({ class: classData._id }).populate('student', 'name')
 
     const students = classStdents.map((classStudent) => {
       return classStudent.student
     })
+    {
+      const { _id, name, subject, teacher, startDate, endDate } = classData
 
-    console.log(students, 'studentsstudentsstudentsstudents')
-    console.log(classData, 'classDataclassDataclassData')
-    const {_id, name, subject, teacher, startDate, endDate } = classData
+      const result = {
+        ...{
+          _id,
+          name,
+          subject,
+          teacher,
+          startDate: moment(startDate).format("YYYY-MM-DD"),
+          endDate: moment(endDate).format("YYYY-MM-DD")
+        }, ...{ students }
+      }
+    }
+    try {
+      res.send(students);
+    } catch (error) {
+      res.send(error)
+    }
+  },
+  studentClass: async (req, res) => {
+    const token = req.header('auth-token');
+    const auth = await Auth.findOne({ token: token }).populate('user');
+    const userId = auth.user._id;
 
-    const result = {...{
-      _id, 
-      name, 
-      subject, 
-      teacher, 
-      startDate: moment(startDate).format("YYYY-MM-DD"), 
-      endDate : moment(endDate).format("YYYY-MM-DD")
-    },...{students}}
+    const classesRegistered = await Class_Detail.find({ student: userId }).populate('class', 'name');
+    const classes = classesRegistered.map((classRegistered) => {
+      return classRegistered.class
+    });
 
     try {
-      res.send(result);
+      res.send(classes);
+    } catch (error) {
+      res.send(error)
+    }
+  },
+  teacherClass: async (req, res) => {
+    const token = req.header('auth-token');
+    const auth = await Auth.findOne({ token: token }).populate('user');
+    const userId = auth.user._id;
+
+    const classesRegistered = await Class.find({ teacher: userId }, { name: 1, subject: 1, teacher: 0 }).populate('teacher', 'name');
+
+    try {
+      res.send(classesRegistered);
     } catch (error) {
       res.send(error)
     }

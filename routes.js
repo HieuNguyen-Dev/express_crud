@@ -21,14 +21,19 @@ module.exports = function (app) {
     app.route('/students')
         .get(verify.isTeacher, read.getStudents);
     app.route('/subjects')
-        .get(verify.isAdmin, read.getSubjects);
+        .get(verify.isStudent, read.getSubjects);
+    app.route('/classes')
+        .get(verify.isStudent, read.getClasses);
     app.route('/findStudent/:studentInfo') ///info can be name or email
         .get(verify.isTeacher, read.findStudent);
     app.route('/findUser/:userInfo') ///info can be name or email
         .get(verify.isAdmin, read.findUser);
-    app.route('/studentInClass/:className') 
+    app.route('/studentInClass/:className')
         .get(verify.isTeacher, read.studentInClass);
-
+    app.route('/student/registeredClass')
+        .get(verify.isStudent, read.studentClass);
+    app.route('/teacher/registeredClass')
+        .get(verify.isTeacher, read.teacherClass);
 
     // UPDATE DATA
     app.route('/changePass')

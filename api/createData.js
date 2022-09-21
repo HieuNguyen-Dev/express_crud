@@ -37,7 +37,7 @@ module.exports = {
         const newClass = new Class({
             name: name,
             subject: subject.name,
-            teacher: teacher.name,
+            teacher: teacher.id,
             startDate: startDate,
             endDate: endDate
         });
