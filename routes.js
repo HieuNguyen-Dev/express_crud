@@ -1,8 +1,12 @@
 module.exports = function (app) {
     const auth = require('./api/auth');
     const read = require('./api/readData');
-    const verify = require('./api/checkPermission');
+    const create = require('./api/createData');
     const update = require('./api/updateData');
+    const remove = require('./api/deleteData');
+    const verify = require('./api/checkPermission');
+    const upload = require('./uploadFile');
+
 
 
     // AUTH
@@ -12,22 +16,40 @@ module.exports = function (app) {
         .post(auth.login);
 
     // READ DATA
-    app.route('/userList')
-        .get(verify.isAdmin, read.allUser);
-    app.route('/studentList')
-        .get(verify.isTeacher, read.listStudent);
-    app.route('/findStudent/name/:studentName')
-        .get(verify.isTeacher, read.findStdByName);
-    app.route('/findStudent/email/:studentEmail')
-        .get(verify.isTeacher, read.findStdByEmail);
-    app.route('/findUser/name/:userName')
-        .get(verify.isAdmin, read.findUserByName);
-    app.route('/findUser/email/:userEmail')
-        .get(verify.isAdmin, read.findUserByEmail);
+    app.route('/users')
+        .get(verify.isAdmin, read.getUsers);
+    app.route('/students')
+        .get(verify.isTeacher, read.getStudents);
+    app.route('/subjects')
+        .get(verify.isAdmin, read.getSubjects);
+    app.route('/findStudent/:studentInfo') ///info can be name or email
+        .get(verify.isTeacher, read.findStudent);
+    app.route('/findUser/:userInfo') ///info can be name or email
+        .get(verify.isAdmin, read.findUser);
+    app.route('/studentInClass/:className') 
+        .get(verify.isTeacher, read.studentInClass);
+
 
     // UPDATE DATA
     app.route('/changePass')
         .put(verify.isStudent, update.updatePassword);
     app.route('/resetPass/:userEmail')
         .put(verify.isAdmin, update.resetPassword);
+    app.route('/uploadAvatar')
+        .put(verify.isStudent, upload.uploadImg, update.uploadAvatar);
+    app.route('/updateClass/:className')
+        .put(verify.isAdmin, update.updateClass);
+
+    // CREATE DATA
+    app.route('/createSubject')
+        .post(verify.isAdmin, create.createSubject);
+    app.route('/createClass')
+        .post(verify.isAdmin, create.createClass);
+    app.route('/registerClass')
+        .post(verify.isStudent, create.registerClass);
+    // DELETE DATA
+    app.route('/deleteSubject/:subjectName')
+        .delete(verify.isAdmin, remove.deleteSubject);
+    app.route('/deleteUser/:userId')
+        .delete(verify.isAdmin, remove.deleteUser);
 };

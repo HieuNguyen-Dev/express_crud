@@ -5,8 +5,8 @@ const dotenv = require('dotenv');
 const routes = require('./routes');
 
 // Import Routes
-const authRoute = require('./api/auth');
-const userList = require('./api/readData');
+// const authRoute = require('./api/auth');
+// const userList = require('./api/readData');
 
 dotenv.config();
 

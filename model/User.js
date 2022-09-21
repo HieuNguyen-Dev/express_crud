@@ -24,15 +24,9 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: 'Student'
     },
-    address:{
-        type: String,
-        min: 6,
-        max: 255
-    },
-    birthday:{
-        type: String,
-        min: 6,
-        max: 255
+    avatar:{
+        data: Buffer,
+        contentType: String
     }
 });
 

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../model/User');
-const jwt_decode = require('jwt-decode');
+const Auth = require('../model/Auth');
 
 // module.exports = function (req, res, next){
 //     const token = req.header('auth-token');
@@ -14,12 +14,12 @@ const jwt_decode = require('jwt-decode');
 //     }
 // }
 module.exports = {
-    isAdmin(req, res, next) {
+    isAdmin: async (req, res, next) => {
         const token = req.header('auth-token');
+        const auth = await Auth.findOne({ token: token }).populate('user');
         if (!token) return res.status(401).send('Not token found')
         try {
-            decoded = jwt_decode(token, process.env.TOKEN_SECET);   //DECODE TOKEN    
-            if (decoded.role == "Admin") {
+            if (auth.user.role == "Admin") {
                 next();
             } else {
                 res.send("Access Denied")
@@ -28,12 +28,12 @@ module.exports = {
             res.status(400).send('Invalid Token')
         }
     },
-    isTeacher(req, res, next) {
+    isTeacher: async (req, res, next) => {
         const token = req.header('auth-token');
+        const auth = await Auth.findOne({ token: token }).populate('user');
         if (!token) return res.status(401).send('Not token found')
         try {
-            decoded = jwt_decode(token, process.env.TOKEN_SECET);
-            if (decoded.role == "Admin" || decoded.role == "Teacher") {
+            if (auth.user.role == "Teacher" || auth.user.role == "Admin") {
                 next();
             } else {
                 res.send("Access Denied")
@@ -42,12 +42,12 @@ module.exports = {
             res.status(400).send('Invalid Token')
         }
     },
-    isStudent(req, res, next) {
+    isStudent: async (req, res, next) => {
         const token = req.header('auth-token');
+        const auth = await Auth.findOne({ token: token }).populate('user');
         if (!token) return res.status(401).send('Not token found')
         try {
-            decoded = jwt_decode(token, process.env.TOKEN_SECET);
-            if (decoded.role == "Admin" || decoded.role == "Teacher" || decoded.role == "Student") {
+            if (auth.user.role == "Teacher" || auth.user.role == "Admin" ||  auth.user.role == "Student" ) {
                 next();
             } else {
                 res.send("Access Denied")
